@@ -2033,7 +2033,7 @@ static bool bbr_run_fast_path(struct sock *sk, bool *update_model,
 	return false;
 }
 
-__bpf_kfunc static void bbr_main(struct sock *sk, u32 ack, int flag,
+__bpf_kfunc static void bbr_main(struct sock *sk,
 				 const struct rate_sample *rs)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
@@ -2356,7 +2356,7 @@ static struct tcp_congestion_ops tcp_bbr_cong_ops __read_mostly = {
 	.set_state	= bbr_set_state,
 };
 
-BTF_KFUNCS_START(tcp_bbr_check_kfunc_ids)
+BTF_SET8_START(tcp_bbr_check_kfunc_ids)
 BTF_ID_FLAGS(func, bbr_init)
 BTF_ID_FLAGS(func, bbr_main)
 BTF_ID_FLAGS(func, bbr_sndbuf_expand)
@@ -2366,7 +2366,7 @@ BTF_ID_FLAGS(func, bbr_cwnd_event)
 BTF_ID_FLAGS(func, bbr_ssthresh)
 BTF_ID_FLAGS(func, bbr_tso_segs)
 BTF_ID_FLAGS(func, bbr_set_state)
-BTF_KFUNCS_END(tcp_bbr_check_kfunc_ids)
+BTF_SET8_END(tcp_bbr_check_kfunc_ids)
 
 static const struct btf_kfunc_id_set tcp_bbr_kfunc_set = {
 	.owner = THIS_MODULE,
