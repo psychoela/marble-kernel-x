@@ -273,8 +273,10 @@ struct tcp_sock {
 		repair      : 1,
 		frto        : 1;/* F-RTO (RFC5682) activated in CA_Loss */
 	u8	repair_queue;
+#ifndef __GENKSYMS__
 	u8		fast_ack_mode:1,
 		tlp_orig_data_app_limited:1;
+#endif
 	u8	save_syn:2,	/* Save headers of SYN packet */
 		syn_data:1,	/* SYN includes data */
 		syn_fastopen:1,	/* SYN includes Fast Open option */

@@ -1047,7 +1047,9 @@ enum tcp_ca_event {
 	CA_EVENT_LOSS,		/* loss timeout */
 	CA_EVENT_ECN_NO_CE,	/* ECT set, but not CE marked */
 	CA_EVENT_ECN_IS_CE,	/* received CE marked IP packet */
+#ifndef __GENKSYMS__
 	CA_EVENT_TLP_RECOVERY,	/* a lost segment was repaired by TLP probe */
+#endif
 };
 
 /* Information about inbound ACK, passed to cong_ops->in_ack_event() */
@@ -1094,11 +1096,15 @@ struct ack_sample {
  */
 struct rate_sample {
 	u64  prior_mstamp; /* starting timestamp for interval */
+#ifndef __GENKSYMS__
 	u32  prior_lost;	/* tp->lost at "prior_mstamp" */
+#endif
 	u32  prior_delivered;	/* tp->delivered at "prior_mstamp" */
 	u32  prior_delivered_ce;/* tp->delivered_ce at "prior_mstamp" */
+#ifndef __GENKSYMS__
 	u32 tx_in_flight;	/* packets in flight at starting timestamp */
 	s32  lost;		/* number of packets lost over interval */
+#endif
 	s32  delivered;		/* number of packets delivered over interval */
 	s32  delivered_ce;	/* packets delivered w/ CE mark over interval */
 	long interval_us;	/* time for tp->delivered to incr "delivered" */
@@ -1111,9 +1117,13 @@ struct rate_sample {
 	u32  last_end_seq;	/* end_seq of most recently ACKed packet */
 	bool is_app_limited;	/* is sample from packet with bubble in pipe? */
 	bool is_retrans;	/* is sample from retransmission? */
+#ifndef __GENKSYMS__
 	bool is_acking_tlp_retrans_seq;  /* ACKed a TLP retransmit sequence? */
+#endif
 	bool is_ack_delayed;	/* is this (likely) a delayed ACK? */
+#ifndef __GENKSYMS__
 	bool is_ece;		/* did this ACK have ECN marked? */
+#endif
 };
 
 struct tcp_congestion_ops {
@@ -1137,11 +1147,16 @@ struct tcp_congestion_ops {
 	/* hook for packet ack accounting (optional) */
 	void (*pkts_acked)(struct sock *sk, const struct ack_sample *sample);
 
+#ifdef __GENKSYMS__
+	/* override sysctl_tcp_min_tso_segs */
+	u32 (*min_tso_segs)(struct sock *sk);
+#else
 	/* pick target number of segments per TSO/GSO skb (optional): */
 	u32 (*tso_segs)(struct sock *sk, unsigned int mss_now);
 
 	/* react to a specific lost skb (optional) */
 	void (*skb_marked_lost)(struct sock *sk, const struct sk_buff *skb);
+#endif
 
 	/* call when packets are delivered to update cwnd and pacing rate,
 	 * after all the ca_state processing. (optional)
@@ -2293,7 +2308,11 @@ struct tcp_plb_state {
 	u8	consec_cong_rounds:5, /* consecutive congested rounds */
 		unused:3;
 	u32	pause_until; /* jiffies32 when PLB can resume rerouting */
+#ifdef __GENKSYMS__
+};
+#else
 } __attribute__ ((__packed__));
+#endif
 
 static inline void tcp_plb_init(const struct sock *sk,
 				struct tcp_plb_state *plb)
